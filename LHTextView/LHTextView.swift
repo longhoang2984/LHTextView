@@ -58,15 +58,13 @@ class LHTextView: UITextView, UITextViewDelegate {
     
     @IBInspectable var defaultHeight: CGFloat = 30 {
         didSet {
-            self.height.constant = defaultHeight + topOfContainerView
             resizeTextView()
-            resizeLineView()
         }
     }
     
     @IBInspectable var lineHeight: CGFloat = 1 {
         didSet {
-            resizeLineView()
+            resizeTextView()
             self.layoutIfNeeded()
         }
     }
@@ -79,13 +77,13 @@ class LHTextView: UITextView, UITextViewDelegate {
     
     @IBInspectable var titleColor: UIColor = .lightGray {
         didSet {
-//            self.resizePlaceholder()
+            resizeTextView()
         }
     }
     
     @IBInspectable var activeTitleColor: UIColor = .black {
         didSet {
-//            self.resizePlaceholder()
+            resizeTextView()
         }
     }
     
@@ -115,19 +113,19 @@ class LHTextView: UITextView, UITextViewDelegate {
     
     @IBInspectable var placeHolderFont: UIFont = UIFont.systemFont(ofSize: 17) {
         didSet {
-            
+            resizeTextView()
         }
     }
     
     @IBInspectable var titleFont: UIFont = UIFont.systemFont(ofSize: 17) {
         didSet {
-            
+            resizeTextView()
         }
     }
     
     @IBInspectable var errorFont: UIFont = UIFont.systemFont(ofSize: 17) {
         didSet {
-            
+            resizeTextView()
         }
     }
     
@@ -170,21 +168,33 @@ class LHTextView: UITextView, UITextViewDelegate {
     fileprivate func setUpLHTextView() {
         self.delegate = self
         self.textContainerInset.top = self.topOfContainerView
-        self.textContainerInset.bottom = 5
+        self.textContainerInset.bottom = lineHeight + 5
         self.translatesAutoresizingMaskIntoConstraints = false
-        height = self.heightAnchor.constraint(equalToConstant: defaultHeight + topOfContainerView)
+        self.isScrollEnabled = false
+        let size = self.sizeThatFits(CGSize(width: self.frame.width, height: CGFloat.greatestFiniteMagnitude))
+        if size.height > defaultHeight + topOfContainerView {
+            height = self.heightAnchor.constraint(equalToConstant: size.height)
+        }else {
+            height = self.heightAnchor.constraint(equalToConstant: defaultHeight + topOfContainerView)
+        }
         height.isActive = true
-        resizeTextView()
         
-//        lineView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(lineView)
         lineView.backgroundColor = .lightGray
         lineView.layer.zPosition = 1
-        resizeLineView()
+        resizeTextView()
+        
     }
     
     fileprivate func resizeTextView() {
-        self.frame.size.height = self.frame.height + self.topOfContainerView
+        let size = self.sizeThatFits(CGSize(width: self.frame.width, height: CGFloat.greatestFiniteMagnitude))
+        if size.height > defaultHeight + topOfContainerView {
+            height.constant = size.height
+        }else {
+            height.constant = defaultHeight + topOfContainerView
+        }
+        self.frame.size.height = height.constant + self.topOfContainerView
+        resizeLineView()
     }
     
     fileprivate func resizeLineView() {
@@ -280,7 +290,14 @@ class LHTextView: UITextView, UITextViewDelegate {
             placeholderLabel.textColor = .lightGray
 
             placeholderLabel.frame = CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight)
-
+        
+            if self.text.isEmpty {
+                placeholderLabel.frame.origin.y = self.textContainerInset.top
+                self.setPlaceHolder(placeholderLabel)
+            }else {
+                placeholderLabel.frame.origin.y = self.textContainerInset.top - self.topOfContainerView
+                self.setTitle(placeholderLabel)
+            }
         }
 
     }
@@ -377,7 +394,7 @@ class LHTextView: UITextView, UITextViewDelegate {
         tV.attributedText = textView.attributedText
         tV.font = textView.font
         tV.textContainerInset = self.textContainerInset
-        tV.textContainer.lineFragmentPadding = 0
+        tV.textContainer.lineFragmentPadding = self.textContainer.lineFragmentPadding
         tV.text = newString
         let fixedWidth = tV.frame.size.width
         tV.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
