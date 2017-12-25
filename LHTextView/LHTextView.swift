@@ -58,12 +58,15 @@ class LHTextView: UITextView, UITextViewDelegate {
     
     @IBInspectable var defaultHeight: CGFloat = 30 {
         didSet {
-            self.layoutIfNeeded()
+            self.height.constant = defaultHeight + topOfContainerView
+            resizeTextView()
+            resizeLineView()
         }
     }
     
-    @IBInspectable var lineViewHeight: CGFloat = 1 {
+    @IBInspectable var lineHeight: CGFloat = 1 {
         didSet {
+            resizeLineView()
             self.layoutIfNeeded()
         }
     }
@@ -170,19 +173,26 @@ class LHTextView: UITextView, UITextViewDelegate {
         self.textContainerInset.bottom = 5
         self.translatesAutoresizingMaskIntoConstraints = false
         height = self.heightAnchor.constraint(equalToConstant: defaultHeight + topOfContainerView)
-        self.frame.size.height = self.frame.height + self.topOfContainerView
         height.isActive = true
+        resizeTextView()
+        
 //        lineView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(lineView)
         lineView.backgroundColor = .lightGray
         lineView.layer.zPosition = 1
-        let labelX = self.textContainer.lineFragmentPadding
-        let labelWidth = self.frame.width - (labelX)
-        lineView.frame = CGRect(x: labelX,y: height.constant - 1, width: labelWidth,height: lineViewHeight)
-        originalBorderFrame  = CGRect(x: labelX,y: frame.height-lineView.frame.height,width: labelWidth,height: lineViewHeight)
-        
+        resizeLineView()
     }
     
+    fileprivate func resizeTextView() {
+        self.frame.size.height = self.frame.height + self.topOfContainerView
+    }
+    
+    fileprivate func resizeLineView() {
+        let labelX = self.textContainer.lineFragmentPadding
+        let labelWidth = self.frame.width - (labelX)
+        lineView.frame = CGRect(x: labelX,y: height.constant - lineHeight, width: labelWidth,height: lineHeight)
+        originalBorderFrame  = CGRect(x: labelX,y: frame.height-lineView.frame.height,width: labelWidth,height: lineHeight)
+    }
     
     var originalBorderFrame: CGRect = .zero
     var originalInsetBottom: CGFloat = 0
@@ -195,8 +205,8 @@ class LHTextView: UITextView, UITextViewDelegate {
         didSet {
             let labelX = self.textContainer.lineFragmentPadding
             let labelWidth = self.frame.width - (labelX)
-            lineView.frame = CGRect(x: labelX,y: frame.height+contentOffset.y-lineViewHeight,width: labelWidth,height: lineViewHeight)
-            originalBorderFrame  = CGRect(x: labelX,y: frame.height-lineViewHeight,width: labelWidth,height: lineViewHeight)
+            lineView.frame = CGRect(x: labelX,y: frame.height+contentOffset.y-lineHeight,width: labelWidth,height: lineHeight)
+            originalBorderFrame  = CGRect(x: labelX,y: frame.height-lineHeight,width: labelWidth,height: lineHeight)
         }
     }
     
@@ -304,6 +314,7 @@ class LHTextView: UITextView, UITextViewDelegate {
     }
     
     func textViewDidChange(_ textView: UITextView) {
+        self.errorMsg = ""
         if let placeholderLabel = self.viewWithTag(100) as? UILabel {
             if self.text.count.hashValue > 0 {
                 placeholderLabel.frame.origin.y = self.textContainerInset.top - self.topOfContainerView

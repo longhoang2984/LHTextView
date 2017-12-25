@@ -20,16 +20,29 @@ class ViewController: UIViewController, LHTextViewDelegate {
         lhTextView.activeTitleColor = .blue
         lhTextView.lineViewColor = .lightGray
         lhTextView.activeLineViewColor = .blue
-//        lhTextView.errorMsg = "Error"
+        lhTextView.errorColor = .red
+        lhTextView.title = "Demo"
+        lhTextView.placeholder = "Placeholder"
+        lhTextView.defaultHeight = 30
+        lhTextView.lineHeight = 1
+        lhTextView.isLTRLanguage = true
+        lhTextView.errorFont = UIFont.boldSystemFont(ofSize: 13)
+        lhTextView.titleFont = UIFont.italicSystemFont(ofSize: 13)
+        lhTextView.placeHolderFont = UIFont.systemFont(ofSize: 13)
+        
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    func textViewDidChange(_ lhTextView: LHTextView) {
-        print(lhTextView.text)
+    
+    func textViewDidChange(_ textView: UITextView) {
+        if let int = Int(textView.text) {
+            lhTextView.errorMsg = ""
+        }else {
+            lhTextView.errorMsg = "Error"
+        }
     }
 }
 
