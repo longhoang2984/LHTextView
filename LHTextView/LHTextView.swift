@@ -11,42 +11,42 @@ import Foundation
 
 @objc protocol LHTextViewDelegate : class, UIScrollViewDelegate {
     @objc @available(iOS 2.0, *)
-    optional func lhTextViewShouldBeginEditing(_ lhTextView: LHTextView) -> Bool
+    optional func textViewShouldBeginEditing(_ textView: UITextView) -> Bool
     
     @objc @available(iOS 2.0, *)
-    optional func lhTextViewShouldEndEditing(_ lhTextView: LHTextView) -> Bool
-    
-    
-    @objc @available(iOS 2.0, *)
-    optional func lhTextViewDidBeginEditing(_ lhTextView: LHTextView)
-    
-    @objc @available(iOS 2.0, *)
-    optional func lhTextViewDidEndEditing(_ lhTextView: LHTextView)
+    optional func textViewShouldEndEditing(_ textView: UITextView) -> Bool
     
     
     @objc @available(iOS 2.0, *)
-    optional func lhTextView(_ lhTextView: LHTextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool
+    optional func textViewDidBeginEditing(_ textView: UITextView)
     
     @objc @available(iOS 2.0, *)
-    optional func lhTextViewDidChange(_ lhTextView: LHTextView)
+    optional func textViewDidEndEditing(_ textView: UITextView)
     
     
     @objc @available(iOS 2.0, *)
-    optional func lhTextViewDidChangeSelection(_ lhTextView: LHTextView)
+    optional  func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool
+    
+    @objc @available(iOS 2.0, *)
+    optional func textViewDidChange(_ textView: UITextView)
+    
+    
+    @objc @available(iOS 2.0, *)
+    optional func textViewDidChangeSelection(_ textView: UITextView)
     
     
     @objc @available(iOS 10.0, *)
-    optional func lhTextView(_ lhTextView: LHTextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool
+    optional func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool
     
     @objc @available(iOS 10.0, *)
-    optional func lhTextView(_ lhTextView: LHTextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool
+    optional func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool
     
     
     @objc @available(iOS, introduced: 7.0, deprecated: 10.0, message: "Use textView:shouldInteractWithURL:inRange:forInteractionType: instead")
-    optional func lhTextView(_ lhTextView: LHTextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool
+    optional func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool
     
     @objc @available(iOS, introduced: 7.0, deprecated: 10.0, message: "Use textView:shouldInteractWithTextAttachment:inRange:forInteractionType: instead")
-    optional func lhTextView(_ lhTextView: LHTextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange) -> Bool
+    optional func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange) -> Bool
 }
 
 @IBDesignable
@@ -58,13 +58,13 @@ class LHTextView: UITextView, UITextViewDelegate {
     
     @IBInspectable var defaultHeight: CGFloat = 30 {
         didSet {
-            self.setUpLHTextView()
+            self.layoutIfNeeded()
         }
     }
     
     @IBInspectable var lineViewHeight: CGFloat = 1 {
         didSet {
-            self.setUpLHTextView()
+            self.layoutIfNeeded()
         }
     }
     
@@ -313,7 +313,7 @@ class LHTextView: UITextView, UITextViewDelegate {
                 self.setPlaceHolder(placeholderLabel)
             }
         }
-        behavior?.lhTextViewDidChange?(self)
+        behavior?.textViewDidChange?(self)
         
     }
     
@@ -326,7 +326,7 @@ class LHTextView: UITextView, UITextViewDelegate {
             }
         }
         lineView.backgroundColor = activeLineViewColor
-        behavior?.lhTextViewDidBeginEditing?(self)
+        behavior?.textViewDidBeginEditing?(textView)
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -338,7 +338,7 @@ class LHTextView: UITextView, UITextViewDelegate {
             }
         }
         lineView.backgroundColor = lineViewColor
-        behavior?.lhTextViewDidBeginEditing?(self)
+        behavior?.textViewDidBeginEditing?(textView)
     }
     
     fileprivate func setTitle(_ placeholderLabel: UILabel) {
@@ -383,7 +383,7 @@ class LHTextView: UITextView, UITextViewDelegate {
             textView.frame = newFrame
             height.constant = defaultHeight + topOfContainerView
         }
-        _ = behavior?.lhTextView?(self, shouldChangeTextIn: range,replacementText: text)
+        _ = behavior?.textView?(self, shouldChangeTextIn: range,replacementText: text)
         return true
     }
 }

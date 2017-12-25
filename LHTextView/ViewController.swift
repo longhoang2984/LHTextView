@@ -15,6 +15,12 @@ class ViewController: UIViewController, LHTextViewDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         lhTextView.behavior = self
+        
+        lhTextView.titleColor = .purple
+        lhTextView.activeTitleColor = .blue
+        lhTextView.lineViewColor = .lightGray
+        lhTextView.activeLineViewColor = .blue
+//        lhTextView.errorMsg = "Error"
     }
 
     override func didReceiveMemoryWarning() {
@@ -22,7 +28,7 @@ class ViewController: UIViewController, LHTextViewDelegate {
         // Dispose of any resources that can be recreated.
     }
 
-    func lhTextViewDidChange(_ lhTextView: LHTextView) {
+    func textViewDidChange(_ lhTextView: LHTextView) {
         print(lhTextView.text)
     }
 }
